@@ -19,7 +19,9 @@ def initalize_databases():
 
     cur.execute("CREATE TABLE IF NOT EXISTS User_Tasks ( User_ID           STRING  REFERENCES Users (User_ID), Task_ID           INT     REFERENCES Tasks (Task_ID), Task_Is_Completed BOOLEAN DEFAULT (FALSE) ); ")
     con.commit()
-    #TODO schedule table
+
+    cur.execute("CREATE TABLE IF NOT EXISTS Scheduler (  User_ID   STRING PRIMARY KEY REFERENCES User_Tasks (User_ID),     Task_List STRING REFERENCES Tasks (Task_Name),    Date      DATE);  ")
+    con.commit()
 
 initalize_databases()
 
