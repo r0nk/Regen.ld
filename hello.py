@@ -48,8 +48,8 @@ def remove_prefix(text, prefix):
 
 def help_task(msg):
     # Gives a message informing the user of the current commands for the bot
-    return "**Thank you for using regen.Id!**\n\
-regen.Id currently has four commands for users' disposal:\n\
+    return "**Thank you for using regen.ld!**\n\
+regen.ld currently has four commands for users' disposal:\n\
 **/add_task** ~ This command allows you to add a task with the ability to specify date and time.\n\
 *-EX: /add_task Task-Final due:Friday time_est:60*\n\
 **/show_tasks** ~ This command lists your current tasks with their deadlines in order of urgency.\n\
