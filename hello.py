@@ -6,19 +6,22 @@ import time
 import maya
 from datetime import datetime
 
+
 con = sqlite3.connect('regen.db')
 cur = con.cursor()
+def initalize_databases():
 
-cur.execute("CREATE TABLE IF NOT EXISTS Users ( User_ID   STRING PRIMARY KEY, User_Name STRING);")
-con.commit()
+    cur.execute("CREATE TABLE IF NOT EXISTS Users ( User_ID   STRING PRIMARY KEY, User_Name STRING);")
+    con.commit()
 
-cur.execute("CREATE TABLE IF NOT EXISTS Tasks ( Task_ID       INTEGER PRIMARY KEY AUTOINCREMENT, Task_Name     STRING   NOT NULL, Task_Due_Date DATETIME, Task_Est_Min  INTEGER); ")
-con.commit()
+    cur.execute("CREATE TABLE IF NOT EXISTS Tasks ( Task_ID       INTEGER PRIMARY KEY AUTOINCREMENT, Task_Name     STRING   NOT NULL, Task_Due_Date DATETIME, Task_Est_Min  INTEGER); ")
+    con.commit()
 
-cur.execute("CREATE TABLE IF NOT EXISTS User_Tasks ( User_ID           STRING  REFERENCES Users (User_ID), Task_ID           INT     REFERENCES Tasks (Task_ID), Task_Is_Completed BOOLEAN DEFAULT (FALSE) ); ")
-con.commit()
+    cur.execute("CREATE TABLE IF NOT EXISTS User_Tasks ( User_ID           STRING  REFERENCES Users (User_ID), Task_ID           INT     REFERENCES Tasks (Task_ID), Task_Is_Completed BOOLEAN DEFAULT (FALSE) ); ")
+    con.commit()
+    #TODO schedule table
 
-#TODO schedule table
+initalize_databases()
 
 class Task:
   def __init__(self, name, due,time_est):
@@ -41,7 +44,7 @@ def add_task(msg):
     t = Task("placeholder_tn",datetime.now(),60)
     for i in msg.split()[1:]:
         if "@" in i:
-            #TODO
+            #TODO handle user role tagging
             print("TODO handle user role tagging")
         elif "due:" in i:
             s=remove_prefix(i,"due:")
@@ -72,6 +75,23 @@ def show_tasks(msg):
         ret = ret + "* " + name[1] + "\n"
     return ret
 
+#for each possible command, send it to its resepective function and 
+# send the user back its output
+async def handle_message(message):
+    if message.content.lower().startswith("/add_task"):
+        #if no there is no : then due date is set to a week
+        # await message.channel.send(task + " added!")
+        await message.channel.send(add_task(message.content.lower()))
+        #just lists commands
+    elif message.content.lower().startswith("/show_tasks"):
+        await message.channel.send(show_tasks(message.content.lower()))
+    elif message.content.lower().startswith("/finish_task"):
+        await message.channel.send(finish_task(message.content.lower()))
+    else:
+        await message.channel.send("hmmm...try again")
+
+
+#handle the discord interface
 class MyClient(discord.Client):
     async def on_ready(self):
         print('Logged on as', self.user)
@@ -84,19 +104,7 @@ class MyClient(discord.Client):
         if message.content[0] == '/':
             print(message.author,":",message.content)
             #recieve task, optional date
-
-            if message.content.lower().startswith("/add_task"):
-                #if no there is no : then due date is set to a week
-               # await message.channel.send(task + " added!")
-                await message.channel.send(add_task(message.content.lower()))
-                #just lists commands
-            elif message.content.lower().startswith("/show_tasks"):
-                await message.channel.send(show_tasks(message.content.lower()))
-            elif message.content.lower().startswith("/finish_task"):
-                await message.channel.send(finish_task(message.content.lower()))
-            else:
-                await message.channel.send("hmmm...try again")
-
+            await handle_message(message)
 
 client = MyClient()
 client.run((open('token.txt','r').read().splitlines()[0]));
