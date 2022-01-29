@@ -114,16 +114,16 @@ async def handle_message(message):
     #TODO message.mentions targets a list of users
     #TODO role_mentions gets a list of roles
     #TODO also role.members
-    if message.content.lower().startswith("/add_task"):
+    if message.content.lower().startswith("/add_task") or message.content.lower().startswith("/add") or message.content.lower().startswith("/a"):
         #if no there is no : then due date is set to a week
         # await message.channel.send(task + " added!")
         await message.channel.send(add_task(message.content.lower()))
         #just lists commands
-    elif message.content.lower().startswith("/show_tasks"):
+    elif message.content.lower().startswith("/show_tasks") or message.content.lower().startswith("/show") or message.content.lower().startswith("/s"):
         await message.channel.send(show_tasks(message.content.lower()))
-    elif message.content.lower().startswith("/finish_task"):
+    elif message.content.lower().startswith("/finish_task") or message.content.lower().startswith("/finish") or message.content.lower().startswith("/f"):
         await message.channel.send(finish_task(message.content.lower()))
-    elif message.content.lower().startswith("/edit_task"):
+    elif message.content.lower().startswith("/edit_task") or message.content.lower().startswith("/edit") or message.content.lower().startswith("/e"):
         await message.channel.send(edit_task(message.content.lower()))
     elif message.content.lower().startswith("/help"):
         await message.channel.send(help_task(message.content.lower()))
