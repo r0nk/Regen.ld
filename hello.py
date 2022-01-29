@@ -29,6 +29,7 @@ class Task:
     self.name = name
     self.due = due
     self.time_est = time_est
+    self.urgency = task_urgency(self)
     taskList = []
 
   def set_task(self, name):
@@ -36,7 +37,7 @@ class Task:
 
 def task_urgency(t):
     n = datetime.now()
-    rd = relative_delta(n,t.due)
+    rd = relativedelta(n,t.due)
     hours_till_deadline=(rd.days*24+rd.hours)
     return 1 - (hours_till_deadline + (t.time_est/10))
 
@@ -77,6 +78,21 @@ def read_task_from_message(msg):
             t.name=i
     return t
 
+def task_sort_key(t):
+    return t.urgency
+
+def get_tasks_from_database():
+    cur.execute("select * from Tasks")
+    t = Task("placeholder_tn",datetime.now(),60)
+    task_list=[]
+    for name in cur.fetchall():
+        t.name = name[1]
+        t.due_date=name[2]
+        t.time_est=name[3]
+        task_list.append(t)
+    task_list.sort(key=task_sort_key,reverse=True)
+    return task_list
+
 def add_task(msg):
     ret = ""
     t = read_task_from_message(msg) 
@@ -104,11 +120,18 @@ def show_tasks(msg):
     cur.execute("select * from Tasks")
     ret=""
     for name in cur.fetchall():
-        ret = ret + "* " + name[1] + "\t"+name[2]+"\t"+str(name[3])+"m\n"
+        ret = ret + "* " + str(name[1]) + "\t"+name[2]+"\t"+str(name[3])+"m\n"
     return ret
 
-def shedule(msg):
-    return "TODO schedule here"
+def schedule(msg):
+    tasks = get_tasks_from_database()
+    minutes_to_work=8*60
+    ret="ret"
+    while minutes_to_work > 0:
+        next_task=tasks.pop(0)
+        ret = ret+next_task.name+"\n"
+        minutes_to_work=minutes_to_work-next_task.time_est
+    return ret
 
 #for each possible command, send it to its resepective function and 
 # send the user back its output
@@ -122,7 +145,7 @@ async def handle_message(message):
         # await message.channel.send(task + " added!")
         await message.channel.send(add_task(message.content.lower()))
         #just lists commands
-    elif message.content.lower().startswith("/show_tasks") or message.content.lower().startswith("/show") or message.content.lower().startswith("/s"):
+    elif message.content.lower().startswith("/show_tasks") or message.content.lower().startswith("/show"):
         await message.channel.send(show_tasks(message.content.lower()))
     elif message.content.lower().startswith("/finish_task") or message.content.lower().startswith("/finish") or message.content.lower().startswith("/f"):
         await message.channel.send(finish_task(message.content.lower()))
