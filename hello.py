@@ -17,6 +17,8 @@ con.commit()
 cur.execute("CREATE TABLE IF NOT EXISTS User_Tasks ( User_ID           STRING  REFERENCES Users (User_ID), Task_ID           INT     REFERENCES Tasks (Task_ID), Task_Is_Completed BOOLEAN DEFAULT (FALSE) ); ")
 con.commit()
 
+#TODO schedule table
+
 class Task:
   def __init__(self, name, due,time_est):
     self.name = name
@@ -31,7 +33,14 @@ def add_task(msg):
     ret = ""
     t = Task("placeholder_tn",datetime.now(),60)
     for i in msg.split()[1:]:
-        if "due:" in i:
+        if "@" in i:
+            #TODO
+            print("TODO handle user role tagging")
+        elif "due:" in i:
+            #TODO
+            print("TODO handle due \n")
+        elif "time_est:" in i or "time_estimate:" in i:
+            #TODO
             print("TODO handle due \n")
         else:
             t.name=i
@@ -43,10 +52,13 @@ def add_task(msg):
 
 def finish_task(msg):
     for i in msg.split()[1:]:
+        #TODO this should check if no other member has this task before deleting,
+        #TODO this is write that the task was completed to the completed tasks log
         cur.execute("DELETE FROM Tasks WHERE Task_Name = '?';",(i,))
         con.commit()
 
 def show_tasks(msg):
+    #TODO this should only show tasks that are assigned to the user calling
     cur.execute("select * from Tasks")
     ret=""
     for name in cur.fetchall():
