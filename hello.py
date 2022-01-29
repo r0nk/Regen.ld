@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 import sqlite3
 import time
+import maya
 from datetime import datetime
 
 con = sqlite3.connect('regen.db')
@@ -29,6 +30,12 @@ class Task:
   def set_task(self, name):
     self.name = name;
 
+#https://stackoverflow.com/questions/16891340/remove-a-prefix-from-a-string
+def remove_prefix(text, prefix):
+    if text.startswith(prefix):
+        return text[len(prefix):]
+    return text  # or whatever
+
 def add_task(msg):
     ret = ""
     t = Task("placeholder_tn",datetime.now(),60)
@@ -37,18 +44,18 @@ def add_task(msg):
             #TODO
             print("TODO handle user role tagging")
         elif "due:" in i:
-            #TODO
-            print("TODO handle due \n")
+            s=remove_prefix(i,"due:")
+            t.due=maya.when(s).datetime()
         elif "time_est:" in i or "time_estimate:" in i:
-            #TODO
-            print("TODO handle due \n")
+            s=remove_prefix(i,"time_est:")
+            t.time_est=int(s)
         else:
             t.name=i
     if t.name == "placeholder_tn":
         return "No name found, task not added."
     cur.execute("insert into Tasks (Task_Name,Task_Due_Date,Task_Est_Min) values ( ?,datetime(),?)",(t.name,t.time_est))
     con.commit()
-    return "Task added!"
+    return "Task "+t.name+" added! Due at "+t.due.strftime('%m/%d/%Y')+" and it should take "+str(t.time_est)+" minutes"
 
 def finish_task(msg):
     for i in msg.split()[1:]:
