@@ -46,6 +46,21 @@ def remove_prefix(text, prefix):
         return text[len(prefix):]
     return text  # or whatever
 
+def help_task(msg):
+    # Gives a message informing the user of the current commands for the bot
+    return "**Thank you for using regen.ld!**\n\
+regen.ld currently has four commands for users' disposal:\n\
+**/add_task** ~ This command allows you to add a task with the ability to specify date and time.\n\
+*-EX: /add_task Task-Final due:Friday time_est:60*\n\
+**/show_tasks** ~ This command lists your current tasks with their deadlines in order of urgency.\n\
+*-EX: Art_Project:2022-01-29 09:17:36 time estimate (minutes): 60*\n\
+*Science_Homework:2022-01-29 09:23:04 time estimate (minutes): 60*\n\
+*Math_Exam:2022-01-29 09:24:44 time estimate (minutes): 60*\n\
+**/edit_task** ~ This command allows one to edit the date and time expectation of a task.\n\
+*-EX: /edit_task Math_Exam due:feb28 time_est:120*\n\
+**/finish_task** ~ This command allows you to remove a task from your personal task list.\n\
+*EX: /finish_task Art_Project*"
+
 def read_task_from_message(msg):
     t = Task("placeholder_tn",datetime.now(),60)
     for i in msg.split()[1:]:
@@ -92,6 +107,9 @@ def show_tasks(msg):
         ret = ret + "* " + name[1] + "\t"+name[2]+"\t"+str(name[3])+"m\n"
     return ret
 
+def shedule(msg):
+    return "TODO schedule here"
+
 #for each possible command, send it to its resepective function and 
 # send the user back its output
 async def handle_message(message):
@@ -110,6 +128,10 @@ async def handle_message(message):
         await message.channel.send(finish_task(message.content.lower()))
     elif message.content.lower().startswith("/edit_task") or message.content.lower().startswith("/edit") or message.content.lower().startswith("/e"):
         await message.channel.send(edit_task(message.content.lower()))
+    elif message.content.lower().startswith("/schedule") or message.content.lower().startswith("/sched") or message.content.lower().startswith("/s"):
+        await message.channel.send(schedule(message.content.lower()))
+    elif message.content.lower().startswith("/help") or message.content.lower().startswith("/h"):
+        await message.channel.send(help_task(message.content.lower()))
     else:
         await message.channel.send("hmmm...try again")
 
