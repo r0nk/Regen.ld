@@ -39,8 +39,7 @@ def remove_prefix(text, prefix):
         return text[len(prefix):]
     return text  # or whatever
 
-def add_task(msg):
-    ret = ""
+def read_task_from_message(msg):
     t = Task("placeholder_tn",datetime.now(),60)
     for i in msg.split()[1:]:
         if "@" in i:
@@ -54,6 +53,11 @@ def add_task(msg):
             t.time_est=int(s)
         else:
             t.name=i
+    return t
+
+def add_task(msg):
+    ret = ""
+    t = read_task_from_message(msg) 
     if t.name == "placeholder_tn":
         return "No name found, task not added."
     cur.execute("insert into Tasks (Task_Name,Task_Due_Date,Task_Est_Min) values ( ?,datetime(),?)",(t.name,t.time_est))
@@ -67,12 +71,18 @@ def finish_task(msg):
         cur.execute("DELETE FROM Tasks WHERE Task_Name = '?';",(i,))
         con.commit()
 
+def edit_task(msg):
+    t = read_task_from_message(msg)
+    cur.execute("update Tasks set Task_Due_Date=(?) where Task_Name = (?)",(t.due,t.name))
+    cur.execute("update Tasks set Task_Est_Min=(?) where Task_Name = (?)",(t.time_est,t.name))
+    return "Task "+t.name+" updated!"
+
 def show_tasks(msg):
     #TODO this should only show tasks that are assigned to the user calling
     cur.execute("select * from Tasks")
     ret=""
     for name in cur.fetchall():
-        ret = ret + "* " + name[1] + "\n"
+        ret = ret + "* " + name[1] + "\t"+name[2]+"\t"+str(name[3])+"m\n"
     return ret
 
 #for each possible command, send it to its resepective function and 
@@ -87,6 +97,8 @@ async def handle_message(message):
         await message.channel.send(show_tasks(message.content.lower()))
     elif message.content.lower().startswith("/finish_task"):
         await message.channel.send(finish_task(message.content.lower()))
+    elif message.content.lower().startswith("/edit_task"):
+        await message.channel.send(edit_task(message.content.lower()))
     else:
         await message.channel.send("hmmm...try again")
 
