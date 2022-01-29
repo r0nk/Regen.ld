@@ -5,12 +5,11 @@ import sqlite3
 import time
 import maya
 from datetime import datetime
-
+from dateutil.relativedelta import relativedelta
 
 con = sqlite3.connect('regen.db')
 cur = con.cursor()
 def initalize_databases():
-
     cur.execute("CREATE TABLE IF NOT EXISTS Users ( User_ID   STRING PRIMARY KEY, User_Name STRING);")
     con.commit()
 
@@ -34,6 +33,12 @@ class Task:
 
   def set_task(self, name):
     self.name = name;
+
+def task_urgency(t):
+    n = datetime.now()
+    rd = relative_delta(n,t.due)
+    hours_till_deadline=(rd.days*24+rd.hours)
+    return 1 - (hours_till_deadline + (t.time_est/10))
 
 #https://stackoverflow.com/questions/16891340/remove-a-prefix-from-a-string
 def remove_prefix(text, prefix):
