@@ -107,6 +107,9 @@ def show_tasks(msg):
         ret = ret + "* " + name[1] + "\t"+name[2]+"\t"+str(name[3])+"m\n"
     return ret
 
+def shedule(msg):
+    return "TODO schedule here"
+
 #for each possible command, send it to its resepective function and 
 # send the user back its output
 async def handle_message(message):
@@ -125,6 +128,8 @@ async def handle_message(message):
         await message.channel.send(finish_task(message.content.lower()))
     elif message.content.lower().startswith("/edit_task") or message.content.lower().startswith("/edit") or message.content.lower().startswith("/e"):
         await message.channel.send(edit_task(message.content.lower()))
+    elif message.content.lower().startswith("/schedule") or message.content.lower().startswith("/sched") or message.content.lower().startswith("/s"):
+        await message.channel.send(schedule(message.content.lower()))
     elif message.content.lower().startswith("/help"):
         await message.channel.send(help_task(message.content.lower()))
     else:
