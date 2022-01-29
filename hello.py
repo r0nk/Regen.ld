@@ -5,11 +5,12 @@ import sqlite3
 import time
 import maya
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
+
 
 con = sqlite3.connect('regen.db')
 cur = con.cursor()
 def initalize_databases():
+
     cur.execute("CREATE TABLE IF NOT EXISTS Users ( User_ID   STRING PRIMARY KEY, User_Name STRING);")
     con.commit()
 
@@ -18,9 +19,7 @@ def initalize_databases():
 
     cur.execute("CREATE TABLE IF NOT EXISTS User_Tasks ( User_ID           STRING  REFERENCES Users (User_ID), Task_ID           INT     REFERENCES Tasks (Task_ID), Task_Is_Completed BOOLEAN DEFAULT (FALSE) ); ")
     con.commit()
-
-    cur.execute("CREATE TABLE IF NOT EXISTS Scheduler (  User_ID   STRING PRIMARY KEY REFERENCES User_Tasks (User_ID),     Task_List STRING REFERENCES Tasks (Task_Name),    Date      DATE);  ")
-    con.commit()
+    #TODO schedule table
 
 initalize_databases()
 
@@ -33,12 +32,6 @@ class Task:
 
   def set_task(self, name):
     self.name = name;
-
-def task_urgency(t):
-    n = datetime.now()
-    rd = relative_delta(n,t.due)
-    hours_till_deadline=(rd.days*24+rd.hours)
-    return 1 - (hours_till_deadline + (t.time_est/10))
 
 #https://stackoverflow.com/questions/16891340/remove-a-prefix-from-a-string
 def remove_prefix(text, prefix):
@@ -61,6 +54,21 @@ def read_task_from_message(msg):
         else:
             t.name=i
     return t
+
+def help_task(msg):
+    # Gives a message informing the user of the current commands for the bot
+    return "**Thank you for using regen.Id!**\n\
+regen.Id currently has four commands for users' disposal:\n\
+**/add_task** ~ This command allows you to add a task with the ability to specify date and time.\n\
+*-EX: /add_task Task-Final due:Friday time_est:60*\n\
+**/show_tasks** ~ This command lists your current tasks with their deadlines in order of urgency.\n\
+*-EX: Art_Project:2022-01-29 09:17:36 time estimate (minutes): 60*\n\
+*Science_Homework:2022-01-29 09:23:04 time estimate (minutes): 60*\n\
+*Math_Exam:2022-01-29 09:24:44 time estimate (minutes): 60*\n\
+**/edit_task** ~ This command allows one to edit the date and time expectation of a task.\n\
+*-EX: /edit_task Math_Exam due:feb28 time_est:120*\n\
+**/finish_task** ~ This command allows you to remove a task from your personal task list.\n\
+*EX: /finish_task Art_Project*"
 
 def add_task(msg):
     ret = ""
@@ -95,10 +103,6 @@ def show_tasks(msg):
 #for each possible command, send it to its resepective function and 
 # send the user back its output
 async def handle_message(message):
-    #Docs https://discordpy.readthedocs.io/en/stable/api.html?highlight=message#discord.Message
-    #TODO message.mentions targets a list of users
-    #TODO role_mentions gets a list of roles
-    #TODO also role.members
     if message.content.lower().startswith("/add_task"):
         #if no there is no : then due date is set to a week
         # await message.channel.send(task + " added!")
@@ -110,6 +114,8 @@ async def handle_message(message):
         await message.channel.send(finish_task(message.content.lower()))
     elif message.content.lower().startswith("/edit_task"):
         await message.channel.send(edit_task(message.content.lower()))
+    elif message.content.lower().startswith("/help"):
+        await message.channel.send(help_task(message.content.lower()))
     else:
         await message.channel.send("hmmm...try again")
 
