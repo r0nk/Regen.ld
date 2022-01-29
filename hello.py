@@ -88,6 +88,10 @@ def show_tasks(msg):
 #for each possible command, send it to its resepective function and 
 # send the user back its output
 async def handle_message(message):
+    #Docs https://discordpy.readthedocs.io/en/stable/api.html?highlight=message#discord.Message
+    #TODO message.mentions targets a list of users
+    #TODO role_mentions gets a list of roles
+    #TODO also role.members
     if message.content.lower().startswith("/add_task"):
         #if no there is no : then due date is set to a week
         # await message.channel.send(task + " added!")
