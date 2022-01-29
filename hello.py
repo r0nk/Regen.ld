@@ -16,7 +16,18 @@ class MyClient(discord.Client):
             if message.content.lower().startswith("*hello"):
                 await message.channel.send("hello world!")
 
+            else if message.content.lower().startswith("*add"):
+                await message.channel.send("task added!")
+
+            else if message.content.lower().startswith("*view")
+                await message.channel.send("here are all the tasks you need to complete!")
+
+            else if message.content.lower().startswith("*delete")
+                await message.channel.send("here are all the tasks you need to complete!")
+
+            else
+                await message.channel.send("hmm...try again")
+
 client = MyClient()
 client.run((open('token.txt','r').read().splitlines()[0]));
 con.close()
-
