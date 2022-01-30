@@ -43,21 +43,21 @@ def help_task(msg):
     # Gives a message informing the user of the current commands for the bot
     return "**Thank you for using regen.ld!**\n\
 regen.ld currently has four commands for users' disposal:\n\
-**/add_task* or */at** ~ This command allows you to add a task with the ability to specify date and time.\n\
+**/add_task** or **/at** ~ This command allows you to add a task with the ability to specify date and time.\n\
 *-EX: /add_task Task-Final due:Friday time_est:60*\n\
-**/show_all* or */sa** ~ This command lists your current tasks with their deadlines in order of urgency.\n\
+**/show_all** or **/sa** ~ This command lists your current tasks with their deadlines in order of urgency.\n\
 *-EX: Art_Project:2022-01-29 09:17:36 time estimate (minutes): 60*\n\
 *Science_Homework:2022-01-29 09:23:04 time estimate (minutes): 60*\n\
 *Math_Exam:2022-01-29 09:24:44 time estimate (minutes): 60*\n\
-**/edit_task* or */et** ~ This command allows one to edit the date and time expectation of a task.\n\
+**/edit_task** or **/et** ~ This command allows one to edit the date and time expectation of a task.\n\
 *-EX: /edit_task Math_Exam due:feb28 time_est:120*\n\
-**/finish_task* or */ft** ~ This command allows you to remove a task from your personal task list.\n\
+**/finish_task** or **/ft** ~ This command allows you to remove a task from your personal task list.\n\
 *-EX: /finish_task Art_Project*\n\
-**/add_schedule* or */as** ~ This command allows you to schedule tasks for today (Limited up to 8 time estimated hours). \n\
-*-EX: ADD SOMETHING HERE FOR \schedule \n\
-**/show_schedule* or */ss** ~ This command lets you to view today's schedule. \n\
-*-EX: /show_today* \n\
-**/show_employee* or */se** ~ This command shows employee statistical data. \n\
+**/add_schedule** or **/as** ~ This command allows you to schedule tasks for today (Limited up to 8 time estimated hours). \n\
+*-EX:/add_schedule*\n\
+**/show_schedule** or **/ss** ~ This command lets you to view today's schedule. \n\
+*-EX: /show_schedule* \n\
+**/show_employee** or **/se** ~ This command shows employee statistical data. \n\
 *-EX: /show_employee*"
 
 
