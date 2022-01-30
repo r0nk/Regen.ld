@@ -58,6 +58,7 @@ regen.ld currently has four commands for users' disposal:\n\
 **/show_schedule** or **/ss** ~ This command lets you to view today's schedule. \n\
 *-EX: /show_today* \n\
 **/show_employee** or **/se** ~ This command shows employee statistical data. \n\
+
 *-EX: /show_employee*"
 
 
