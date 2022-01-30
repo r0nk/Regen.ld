@@ -95,7 +95,7 @@ def get_tasks_from_database():
 
 def add_task(msg):
     ret = ""
-    t = read_task_from_message(msg) 
+    t = read_task_from_message(msg)
     if t.name == "placeholder_tn":
         return "No name found, task not added."
     cur.execute("insert into Tasks (Task_Name,Task_Due_Date,Task_Est_Min) values ( ?,datetime(),?)",(t.name,t.time_est))
@@ -133,7 +133,7 @@ def schedule(msg):
         minutes_to_work=minutes_to_work-next_task.time_est
     return ret
 
-#for each possible command, send it to its resepective function and 
+#for each possible command, send it to its resepective function and
 # send the user back its output
 async def handle_message(message):
     #Docs https://discordpy.readthedocs.io/en/stable/api.html?highlight=message#discord.Message
@@ -142,19 +142,21 @@ async def handle_message(message):
     #TODO also role.members
     if message.content.lower().startswith("/add_task") or message.content.lower().startswith("/add") or message.content.lower().startswith("/a"):
         #if no there is no : then due date is set to a week
-        # await message.channel.send(task + " added!")
         await message.channel.send(add_task(message.content.lower()))
+        await channel.send(file=discord.File('gifs/to-do.gif'))
         #just lists commands
     elif message.content.lower().startswith("/show_tasks") or message.content.lower().startswith("/show"):
         await message.channel.send(show_tasks(message.content.lower()))
     elif message.content.lower().startswith("/finish_task") or message.content.lower().startswith("/finish"):
         await message.channel.send(finish_task(message.content.lower()))
+        await channel.send(file=discord.File('gifs/celebration.gif'))
     elif message.content.lower().startswith("/edit_task") or message.content.lower().startswith("/edit"):
         await message.channel.send(edit_task(message.content.lower()))
     elif message.content.lower().startswith("/schedule") or message.content.lower().startswith("/sched"):
         await message.channel.send(schedule(message.content.lower()))
     elif message.content.lower().startswith("/help"):
         await message.channel.send(help_task(message.content.lower()))
+        await channel.send(file=discord.File('gifs/help_sent.gif'))
     else:
         await message.channel.send("hmmm...try again")
 
