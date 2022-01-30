@@ -4,6 +4,7 @@ from discord.ext import commands
 import sqlite3
 import time
 import maya
+import random
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -140,6 +141,30 @@ def schedule(msg):
         minutes_to_work=minutes_to_work-next_task.time_est
     return ret
 
+def progress_bar(amt, change_lenght_of_bar = 2):
+	'''
+	this function prints out a progress bar 
+	based on a percentage form 0% to 100%.
+	to shorten the progress bar increase change_lenght_of_bar number:
+	1, 2, 5, 10 will produce equal bars
+	1  = 100 ticks
+	2  =  50 ticks
+	5  =  20 ticks
+	10 =  10 ticks
+	'''
+
+	# extended ascii codes needed to print out the progress bar
+	em = bytes([176]).decode('cp437')
+	full = bytes([178]).decode('cp437')
+
+	not_amt = 100 - amt
+	str = full * round(amt/change_lenght_of_bar) + em * round(not_amt/change_lenght_of_bar)
+	return str
+
+def show_employee(msg):
+    #gaming, cooking, breathing
+    return "Steve Skill Tracking:\n" + progress_bar(random.randint(1,100)) + " gaming\n" + progress_bar(random.randint(1,100))  + " cooking\n" + progress_bar(random.randint(1,100)) + " breathing"
+
 #for each possible command, send it to its resepective function and
 # send the user back its output
 async def handle_message(message):
@@ -164,7 +189,7 @@ async def handle_message(message):
     elif message.content.lower().startswith("/show_schedule") or message.content.lower().startswith("/ss"):
         await message.channel.send("TODO SHOW SCHEDULE")
     elif message.content.lower().startswith("/show_employee") or message.content.lower().startswith("/se"):
-        await message.channel.send("TODO SHOW EMPLOYEE")
+        await message.channel.send(show_employee(message.content.lower()))
     elif message.content.lower().startswith("/help"):
         await message.channel.send(help_task(message.content.lower()))
         await message.channel.send(file=discord.File('gifs/help_sent.gif'))
