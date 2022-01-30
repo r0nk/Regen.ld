@@ -51,16 +51,23 @@ def help_task(msg):
     # Gives a message informing the user of the current commands for the bot
     return "**Thank you for using regen.ld!**\n\
 regen.ld currently has four commands for users' disposal:\n\
-**/add_task** ~ This command allows you to add a task with the ability to specify date and time.\n\
+**/add_task* or */at** ~ This command allows you to add a task with the ability to specify date and time.\n\
 *-EX: /add_task Task-Final due:Friday time_est:60*\n\
-**/show_tasks** ~ This command lists your current tasks with their deadlines in order of urgency.\n\
+**/show_all* or */sa** ~ This command lists your current tasks with their deadlines in order of urgency.\n\
 *-EX: Art_Project:2022-01-29 09:17:36 time estimate (minutes): 60*\n\
 *Science_Homework:2022-01-29 09:23:04 time estimate (minutes): 60*\n\
 *Math_Exam:2022-01-29 09:24:44 time estimate (minutes): 60*\n\
-**/edit_task** ~ This command allows one to edit the date and time expectation of a task.\n\
+**/edit_task* or */et** ~ This command allows one to edit the date and time expectation of a task.\n\
 *-EX: /edit_task Math_Exam due:feb28 time_est:120*\n\
-**/finish_task** ~ This command allows you to remove a task from your personal task list.\n\
-*EX: /finish_task Art_Project*"
+**/finish_task* or */ft** ~ This command allows you to remove a task from your personal task list.\n\
+*-EX: /finish_task Art_Project*\n\
+**/add_schedule* or */as** ~ This command allows you to schedule tasks for today (Limited up to 8 time estimated hours). \n\
+*-EX: ADD SOMETHING HERE FOR \schedule \n\
+**/show_schedule* or */ss** ~ This command lets you to view today's schedule. \n\
+*-EX: /show_today* \n\
+**/show_employee* or */se** ~ This command shows employee statistical data. \n\
+*-EX: /show_employee*"
+
 
 def read_task_from_message(msg):
     t = Task("placeholder_tn",datetime.now(),60)
@@ -140,20 +147,24 @@ async def handle_message(message):
     #TODO message.mentions targets a list of users
     #TODO role_mentions gets a list of roles
     #TODO also role.members
-    if message.content.lower().startswith("/add_task") or message.content.lower().startswith("/add") or message.content.lower().startswith("/a"):
+    if message.content.lower().startswith("/add_task") or message.content.lower().startswith("/at"):
         #if no there is no : then due date is set to a week
         await message.channel.send(add_task(message.content.lower()))
         await message.channel.send(file=discord.File('gifs/to-do.gif'))
         #just lists commands
-    elif message.content.lower().startswith("/show_tasks") or message.content.lower().startswith("/show"):
+    elif message.content.lower().startswith("/show_all") or message.content.lower().startswith("/sa"):
         await message.channel.send(show_tasks(message.content.lower()))
-    elif message.content.lower().startswith("/finish_task") or message.content.lower().startswith("/finish"):
+    elif message.content.lower().startswith("/finish_task") or message.content.lower().startswith("/ft"):
         await message.channel.send(finish_task(message.content.lower()))
         await message.channel.send(file=discord.File('gifs/celebration.gif'))
-    elif message.content.lower().startswith("/edit_task") or message.content.lower().startswith("/edit"):
+    elif message.content.lower().startswith("/edit_task") or message.content.lower().startswith("/ed"):
         await message.channel.send(edit_task(message.content.lower()))
-    elif message.content.lower().startswith("/schedule") or message.content.lower().startswith("/sched"):
+    elif message.content.lower().startswith("/add_schedule") or message.content.lower().startswith("/as"):
         await message.channel.send(schedule(message.content.lower()))
+    elif message.content.lower().startswith("/show_schedule") or message.content.lower().startswith("/ss"):
+        await message.channel.send("TODO SHOW SCHEDULE")
+    elif message.content.lower().startswith("/show_employee") or message.content.lower().startswith("/se"):
+        await message.channel.send("TODO SHOW EMPLOYEE")
     elif message.content.lower().startswith("/help"):
         await message.channel.send(help_task(message.content.lower()))
         await message.channel.send(file=discord.File('gifs/help_sent.gif'))
