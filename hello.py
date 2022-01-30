@@ -147,11 +147,11 @@ async def handle_message(message):
         #just lists commands
     elif message.content.lower().startswith("/show_tasks") or message.content.lower().startswith("/show"):
         await message.channel.send(show_tasks(message.content.lower()))
-    elif message.content.lower().startswith("/finish_task") or message.content.lower().startswith("/finish") or message.content.lower().startswith("/f"):
+    elif message.content.lower().startswith("/finish_task") or message.content.lower().startswith("/finish"):
         await message.channel.send(finish_task(message.content.lower()))
-    elif message.content.lower().startswith("/edit_task") or message.content.lower().startswith("/edit") or message.content.lower().startswith("/e"):
+    elif message.content.lower().startswith("/edit_task") or message.content.lower().startswith("/edit"):
         await message.channel.send(edit_task(message.content.lower()))
-    elif message.content.lower().startswith("/schedule") or message.content.lower().startswith("/sched") or message.content.lower().startswith("/s"):
+    elif message.content.lower().startswith("/schedule") or message.content.lower().startswith("/sched"):
         await message.channel.send(schedule(message.content.lower()))
     elif message.content.lower().startswith("/help"):
         await message.channel.send(help_task(message.content.lower()))
