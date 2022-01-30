@@ -11,7 +11,7 @@ from dateutil.relativedelta import relativedelta
 con = sqlite3.connect('regen.db')
 cur = con.cursor()
 def initalize_databases():
-    cur.execute("CREATE TABLE IF NOT EXISTS Database_Table (    User_ID        STRING   PRIMARY KEY,    Task_Name      STRING,    Task_ID        INTEGER,    Scheduled_Date DATE,    Due_Date       DATETIME,    Time_Est       INTEGER,    Tags           STRING,    State          STRING);")
+    cur.execute("CREATE TABLE IF NOT EXISTS Tasks (    User_ID        STRING,    Task_Name      STRING PRIMARY KEY,   Scheduled_Date DATE,    Due_Date       DATETIME,    Time_Est       INTEGER,    Tags           STRING,    State          STRING);")
     con.commit()
 
 initalize_databases()
@@ -65,8 +65,7 @@ def read_task_from_message(msg):
     t = Task("placeholder_tn",datetime.now(),60)
     for i in msg.split()[1:]:
         if "@" in i:
-            #TODO handle user role tagging
-            print("TODO handle user role tagging")
+            continue
         elif "due:" in i:
             s=remove_prefix(i,"due:")
             t.due=maya.when(s).datetime()
@@ -86,51 +85,53 @@ def get_tasks_from_database():
     task_list=[]
     for name in cur.fetchall():
         t.name = name[1]
-        t.due_date=name[2]
-        t.time_est=name[3]
+        t.due_date=name[3]
+        t.time_est=name[4]
         task_list.append(t)
     task_list.sort(key=task_sort_key,reverse=True)
     return task_list
 
-def add_task(user,msg):
-    print(user.id)
-    ret = ""
-    t = read_task_from_message(msg)
+def add_task(user,t):
     if t.name == "placeholder_tn":
         return "No name found, task not added."
-    cur.execute("insert into Tasks (Task_Name,Task_Due_Date,Task_Est_Min) values ( ?,datetime(),?)",(t.name,t.time_est))
+    cur.execute("insert into Tasks (User_ID,Task_Name,Due_Date,Time_Est,State) values ( ?,?,?,?,?)",(user.id,t.name,t.due,t.time_est,"NEW"))
     con.commit()
     return "Task "+t.name+" added! Due at "+t.due.strftime('%m/%d/%Y')+" and it should take "+str(t.time_est)+" minutes"
 
-def finish_task(msg):
+def finish_task(user,msg):
     for i in msg.split()[1:]:
-        #TODO this should check if no other member has this task before deleting,
-        #TODO this is write that the task was completed to the completed tasks log
-        cur.execute("DELETE FROM Tasks WHERE Task_Name = '?';",(i,))
-        con.commit()
+        cur.execute("update Tasks set state='complete' where User_ID = (?) and Task_Name = (?)",(user.id,t.name))
 
 def edit_task(msg):
     t = read_task_from_message(msg)
-    cur.execute("update Tasks set Task_Due_Date=(?) where Task_Name = (?)",(t.due,t.name))
+    cur.execute("update Tasks set Due_Date=(?) where Task_Name = (?)",(t.due,t.name))
     cur.execute("update Tasks set Task_Est_Min=(?) where Task_Name = (?)",(t.time_est,t.name))
     return "Task "+t.name+" updated!"
 
-def show_tasks(msg):
-    #TODO this should only show tasks that are assigned to the user calling
-    cur.execute("select * from Tasks")
+def show_tasks(user,msg):
+    cur.execute("select * from Tasks where State != 'complete' and User_ID = (?) ",(user.id,))
     ret=""
     for name in cur.fetchall():
-        ret = ret + "* " + str(name[1]) + "\t"+name[2]+"\t"+str(name[3])+"m\n"
+        ret = ret + "* " + str(name[1]) + "\t"+name[3]+"\t"+str(name[4])+"m\n"
     return ret
 
-def schedule(msg):
+def schedule(user,msg):
     tasks = get_tasks_from_database()
     minutes_to_work=8*60
     ret="ret"
     while minutes_to_work > 0:
         next_task=tasks.pop(0)
-        ret = ret+next_task.name+"\n"
+        cur.execute("update Tasks set Scheduled_Date = DATE('now') where User_ID = (?) and Task_Name = (?)",(user.id,next_task.name))
         minutes_to_work=minutes_to_work-next_task.time_est
+    return ret
+
+def show_schedule(user,msg):
+    cur.execute("select * from Tasks where Scheduled_Date = DATE('now') and User_ID = (?)",(user.id,))
+    ret="Tasks to do today\n"
+    for name in cur.fetchall():
+        ret = ret + "* " + str(name[1]) + "\t"+name[3]+"\t"+str(name[4])+"m\n"
+    tasks = get_tasks_from_database()
+    ret = ret + progress_bar(50)
     return ret
 
 def progress_bar(amt, change_lenght_of_bar = 2):
@@ -165,24 +166,26 @@ async def handle_message(message):
     #TODO role_mentions gets a list of roles
     #TODO also role.members
     mcl=message.content.lower()
+    ma=message.author
     if mcl.startswith("/add_task") or mcl.startswith("/at"):
         #if no there is no : then due date is set to a week
-        await message.channel.send(add_task(message.author,mcl))
+        t = read_task_from_message(mcl)
+        await message.channel.send(add_task(ma,t))
         #for each tagged user
         #   also add task for user 
         await message.channel.send(file=discord.File('gifs/to-do.gif'))
         #just lists commands
     elif mcl.startswith("/show_all") or mcl.startswith("/sa"):
-        await message.channel.send(show_tasks(mcl))
+        await message.channel.send(show_tasks(ma,mcl))
     elif mcl.startswith("/finish_task") or mcl.startswith("/ft"):
         await message.channel.send(finish_task(mcl))
         await message.channel.send(file=discord.File('gifs/celebration.gif'))
     elif mcl.startswith("/edit_task") or mcl.startswith("/et"):
         await message.channel.send(edit_task(mcl))
     elif mcl.startswith("/add_schedule") or mcl.startswith("/as"):
-        await message.channel.send(schedule(mcl))
+        await message.channel.send(schedule(ma,mcl))
     elif mcl.startswith("/show_schedule") or mcl.startswith("/ss"):
-        await message.channel.send("TODO SHOW SCHEDULE")
+        await message.channel.send(show_schedule(ma,mcl))
     elif mcl.startswith("/show_employee") or mcl.startswith("/se"):
         await message.channel.send(show_employee(mcl))
     elif mcl.startswith("/help"):
