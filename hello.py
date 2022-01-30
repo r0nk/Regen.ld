@@ -11,16 +11,7 @@ from dateutil.relativedelta import relativedelta
 con = sqlite3.connect('regen.db')
 cur = con.cursor()
 def initalize_databases():
-    cur.execute("CREATE TABLE IF NOT EXISTS Users ( User_ID   STRING PRIMARY KEY, User_Name STRING);")
-    con.commit()
-
-    cur.execute("CREATE TABLE IF NOT EXISTS Tasks ( Task_ID       INTEGER PRIMARY KEY AUTOINCREMENT, Task_Name     STRING   NOT NULL, Task_Due_Date DATETIME, Task_Est_Min  INTEGER); ")
-    con.commit()
-
-    cur.execute("CREATE TABLE IF NOT EXISTS User_Tasks ( User_ID           STRING  REFERENCES Users (User_ID), Task_ID           INT     REFERENCES Tasks (Task_ID), Task_Is_Completed BOOLEAN DEFAULT (FALSE) ); ")
-    con.commit()
-
-    cur.execute("CREATE TABLE IF NOT EXISTS Scheduler (  User_ID   STRING PRIMARY KEY REFERENCES User_Tasks (User_ID),     Task_List STRING REFERENCES Tasks (Task_Name),    Date      DATE);  ")
+    cur.execute("CREATE TABLE IF NOT EXISTS Database_Table (    User_ID        STRING   PRIMARY KEY,    Task_Name      STRING,    Task_ID        INTEGER,    Scheduled_Date DATE,    Due_Date       DATETIME,    Time_Est       INTEGER,    Tags           STRING,    State          STRING);")
     con.commit()
 
 initalize_databases()
