@@ -11,7 +11,7 @@ from dateutil.relativedelta import relativedelta
 con = sqlite3.connect('regen.db')
 cur = con.cursor()
 def initalize_databases():
-    cur.execute("CREATE TABLE IF NOT EXISTS Tasks (    User_ID        STRING,    Task_Name      STRING PRIMARY KEY,   Scheduled_Date DATE,    Due_Date       DATETIME,    Time_Est       INTEGER,    Tags           STRING,    State          STRING);")
+    cur.execute("CREATE TABLE IF NOT EXISTS Tasks (    User_ID        STRING,    Task_Name      STRING,   Scheduled_Date DATE,    Due_Date       DATETIME,    Time_Est       INTEGER,    Tags           STRING,    State          STRING);")
     con.commit()
 
 initalize_databases()
@@ -81,9 +81,9 @@ def task_sort_key(t):
 
 def get_tasks_from_database():
     cur.execute("select * from Tasks")
-    t = Task("placeholder_tn",datetime.now(),60)
     task_list=[]
     for name in cur.fetchall():
+        t = Task("placeholder_tn",datetime.now(),60)
         t.name = name[1]
         t.due_date=name[3]
         t.time_est=name[4]
@@ -99,8 +99,11 @@ def add_task(user,t):
     return "Task "+t.name+" added! Due at "+t.due.strftime('%m/%d/%Y')+" and it should take "+str(t.time_est)+" minutes"
 
 def finish_task(user,msg):
+    t = read_task_from_message(msg)
     for i in msg.split()[1:]:
         cur.execute("update Tasks set state='complete' where User_ID = (?) and Task_Name = (?)",(user.id,t.name))
+        con.commit()
+    return "Task "+t.name+" finished!"
 
 def edit_task(msg):
     t = read_task_from_message(msg)
@@ -119,19 +122,29 @@ def schedule(user,msg):
     tasks = get_tasks_from_database()
     minutes_to_work=8*60
     ret="ret"
-    while minutes_to_work > 0:
-        next_task=tasks.pop(0)
-        cur.execute("update Tasks set Scheduled_Date = DATE('now') where User_ID = (?) and Task_Name = (?)",(user.id,next_task.name))
-        minutes_to_work=minutes_to_work-next_task.time_est
+    for t in tasks:
+        cur.execute("update Tasks set Scheduled_Date = DATE('now') where User_ID = (?) and Task_Name = (?)",(user.id,t.name))
+        con.commit()
+        minutes_to_work=minutes_to_work-t.time_est
+        print(t.name+" minutes_to_work:"+str(minutes_to_work))
+        if minutes_to_work < 0:
+            break
     return ret
 
 def show_schedule(user,msg):
     cur.execute("select * from Tasks where Scheduled_Date = DATE('now') and User_ID = (?)",(user.id,))
     ret="Tasks to do today\n"
+    task_count=0
+    completed_count=0
     for name in cur.fetchall():
-        ret = ret + "* " + str(name[1]) + "\t"+name[3]+"\t"+str(name[4])+"m\n"
+        task_count=task_count+1
+        ret = ret + "* " + str(name[1]) + "\t"+name[3]+"\t"+str(name[4])+"m "
+        if name[6] == 'complete':
+            completed_count=completed_count+1
+            ret= ret+ ":white_check_mark:"
+        ret=ret+"\n"
     tasks = get_tasks_from_database()
-    ret = ret + progress_bar(50)
+    ret = ret + progress_bar(100*(completed_count/task_count))
     return ret
 
 def progress_bar(amt, change_lenght_of_bar = 2):
@@ -162,26 +175,26 @@ def show_employee(msg):
 # send the user back its output
 async def handle_message(message):
     #Docs https://discordpy.readthedocs.io/en/stable/api.html?highlight=message#discord.Message
-    #TODO message.mentions targets a list of users
-    #TODO role_mentions gets a list of roles
-    #TODO also role.members
     mcl=message.content.lower()
     ma=message.author
     if mcl.startswith("/add_task") or mcl.startswith("/at"):
         #if no there is no : then due date is set to a week
         t = read_task_from_message(mcl)
+        for member in message.mentions:
+            add_task(member,t)
+        for r in message.role_mentions:
+            for member in r.members:
+                add_task(member,t)
         await message.channel.send(add_task(ma,t))
-        #for each tagged user
-        #   also add task for user 
         await message.channel.send(file=discord.File('gifs/to-do.gif'))
         #just lists commands
     elif mcl.startswith("/show_all") or mcl.startswith("/sa"):
         await message.channel.send(show_tasks(ma,mcl))
     elif mcl.startswith("/finish_task") or mcl.startswith("/ft"):
-        await message.channel.send(finish_task(mcl))
+        await message.channel.send(finish_task(ma,mcl))
         await message.channel.send(file=discord.File('gifs/celebration.gif'))
     elif mcl.startswith("/edit_task") or mcl.startswith("/et"):
-        await message.channel.send(edit_task(mcl))
+        await message.channel.send(edit_task(ma,mcl))
     elif mcl.startswith("/add_schedule") or mcl.startswith("/as"):
         await message.channel.send(schedule(ma,mcl))
     elif mcl.startswith("/show_schedule") or mcl.startswith("/ss"):
@@ -199,6 +212,7 @@ async def handle_message(message):
 class MyClient(discord.Client):
     async def on_ready(self):
         print('Logged on as', self.user)
+        print(datetime.now())
 
     async def on_message(self, message):
         # don't respond to ourselves
