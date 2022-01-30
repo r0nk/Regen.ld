@@ -54,11 +54,10 @@ regen.ld currently has four commands for users' disposal:\n\
 **/finish_task** or **/ft** ~ This command allows you to remove a task from your personal task list.\n\
 *-EX: /finish_task Art_Project*\n\
 **/add_schedule** or **/as** ~ This command allows you to schedule tasks for today (Limited up to 8 time estimated hours). \n\
-*-EX: ADD SOMETHING HERE FOR \schedule \n\
+*-EX:/add_schedule*\n\
 **/show_schedule** or **/ss** ~ This command lets you to view today's schedule. \n\
-*-EX: /show_today* \n\
+*-EX: /show_schedule* \n\
 **/show_employee** or **/se** ~ This command shows employee statistical data. \n\
-
 *-EX: /show_employee*"
 
 
