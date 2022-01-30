@@ -177,6 +177,8 @@ async def handle_message(message):
     if mcl.startswith("/add_task") or mcl.startswith("/at"):
         #if no there is no : then due date is set to a week
         await message.channel.send(add_task(message.author,mcl))
+        #for each tagged user
+        #   also add task for user 
         await message.channel.send(file=discord.File('gifs/to-do.gif'))
         #just lists commands
     elif mcl.startswith("/show_all") or mcl.startswith("/sa"):
