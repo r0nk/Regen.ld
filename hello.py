@@ -101,7 +101,8 @@ def get_tasks_from_database():
     task_list.sort(key=task_sort_key,reverse=True)
     return task_list
 
-def add_task(msg):
+def add_task(user,msg):
+    print(user.id)
     ret = ""
     t = read_task_from_message(msg)
     if t.name == "placeholder_tn":
@@ -172,26 +173,27 @@ async def handle_message(message):
     #TODO message.mentions targets a list of users
     #TODO role_mentions gets a list of roles
     #TODO also role.members
-    if message.content.lower().startswith("/add_task") or message.content.lower().startswith("/at"):
+    mcl=message.content.lower()
+    if mcl.startswith("/add_task") or mcl.startswith("/at"):
         #if no there is no : then due date is set to a week
-        await message.channel.send(add_task(message.content.lower()))
+        await message.channel.send(add_task(message.author,mcl))
         await message.channel.send(file=discord.File('gifs/to-do.gif'))
         #just lists commands
-    elif message.content.lower().startswith("/show_all") or message.content.lower().startswith("/sa"):
-        await message.channel.send(show_tasks(message.content.lower()))
-    elif message.content.lower().startswith("/finish_task") or message.content.lower().startswith("/ft"):
-        await message.channel.send(finish_task(message.content.lower()))
+    elif mcl.startswith("/show_all") or mcl.startswith("/sa"):
+        await message.channel.send(show_tasks(mcl))
+    elif mcl.startswith("/finish_task") or mcl.startswith("/ft"):
+        await message.channel.send(finish_task(mcl))
         await message.channel.send(file=discord.File('gifs/celebration.gif'))
-    elif message.content.lower().startswith("/edit_task") or message.content.lower().startswith("/ed"):
-        await message.channel.send(edit_task(message.content.lower()))
-    elif message.content.lower().startswith("/add_schedule") or message.content.lower().startswith("/as"):
-        await message.channel.send(schedule(message.content.lower()))
-    elif message.content.lower().startswith("/show_schedule") or message.content.lower().startswith("/ss"):
+    elif mcl.startswith("/edit_task") or mcl.startswith("/et"):
+        await message.channel.send(edit_task(mcl))
+    elif mcl.startswith("/add_schedule") or mcl.startswith("/as"):
+        await message.channel.send(schedule(mcl))
+    elif mcl.startswith("/show_schedule") or mcl.startswith("/ss"):
         await message.channel.send("TODO SHOW SCHEDULE")
-    elif message.content.lower().startswith("/show_employee") or message.content.lower().startswith("/se"):
-        await message.channel.send(show_employee(message.content.lower()))
-    elif message.content.lower().startswith("/help"):
-        await message.channel.send(help_task(message.content.lower()))
+    elif mcl.startswith("/show_employee") or mcl.startswith("/se"):
+        await message.channel.send(show_employee(mcl))
+    elif mcl.startswith("/help"):
+        await message.channel.send(help_task(mcl))
         await message.channel.send(file=discord.File('gifs/help_sent.gif'))
     else:
         await message.channel.send("hmmm...try again")
