@@ -1,0 +1,6 @@
+GET   finish/task      	Mark a task as complete
+GET   task		List all tasks in the task tree for that user.
+GET   task/name		Get specific information about a task
+GET   task/project/name	Get specific information about a projects subtask
+POST  task/name    	Add a task.
+PATCH task/name		Change a task, possibly marking it as complete

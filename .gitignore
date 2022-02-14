@@ -1,3 +1,8 @@
 token.txt
 regen.db
 *.swp
+.chalice/deployments/
+.chalice/venv/
+core/.chalice/deployments/
+core/.chalice/venv/
+core/__pycache__
