@@ -17,15 +17,15 @@ def initalize_databases():
 initalize_databases()
 
 class Task:
-  def __init__(self, name, due,time_est):
-    self.name = name
-    self.due = due
-    self.time_est = time_est
-    self.urgency = task_urgency(self)
-    taskList = []
+    def __init__(self, name, due,time_est):
+        self.name = name
+        self.due = due
+        self.time_est = time_est
+        self.urgency = task_urgency(self)
+        taskList = []
 
-  def set_task(self, name):
-    self.name = name;
+    def set_task(self, name):
+        self.name = name;
 
 def task_urgency(t):
     n = datetime.now()
@@ -57,8 +57,8 @@ regen.ld currently has four commands for users' disposal:\n\
 *-EX: ADD SOMETHING HERE FOR \schedule \n\
 **/show_schedule* or */ss** ~ This command lets you to view today's schedule. \n\
 *-EX: /show_today* \n\
-**/show_employee* or */se** ~ This command shows employee statistical data. \n\
-*-EX: /show_employee*"
+source: https://github.com/r0nk/Regen.ld \n\
+invite link: https://discord.com/api/oauth2/authorize?client_id=936810894946607144&permissions=431644719168&scope=bot"
 
 
 def read_task_from_message(msg):
@@ -121,7 +121,6 @@ def show_tasks(user,msg):
 def schedule(user,msg):
     tasks = get_tasks_from_database()
     minutes_to_work=8*60
-    ret="ret"
     for t in tasks:
         cur.execute("update Tasks set Scheduled_Date = DATE('now') where User_ID = (?) and Task_Name = (?)",(user.id,t.name))
         con.commit()
@@ -129,6 +128,7 @@ def schedule(user,msg):
         print(t.name+" minutes_to_work:"+str(minutes_to_work))
         if minutes_to_work < 0:
             break
+    ret="schedule " + str((8*60)-minutes_to_work) + " minutes of work today"
     return ret
 
 def show_schedule(user,msg):
@@ -149,7 +149,7 @@ def show_schedule(user,msg):
 
 def progress_bar(amt, change_lenght_of_bar = 2):
 	'''
-	this function prints out a progress bar 
+	this function prints out a progress bar
 	based on a percentage form 0% to 100%.
 	to shorten the progress bar increase change_lenght_of_bar number:
 	1, 2, 5, 10 will produce equal bars
@@ -166,10 +166,6 @@ def progress_bar(amt, change_lenght_of_bar = 2):
 	not_amt = 100 - amt
 	str = full * round(amt/change_lenght_of_bar) + em * round(not_amt/change_lenght_of_bar)
 	return str
-
-def show_employee(msg):
-    #gaming, cooking, breathing
-    return "Steve Skill Tracking:\n" + progress_bar(random.randint(1,100)) + " gaming\n" + progress_bar(random.randint(1,100))  + " cooking\n" + progress_bar(random.randint(1,100)) + " breathing"
 
 #for each possible command, send it to its resepective function and
 # send the user back its output
@@ -199,8 +195,6 @@ async def handle_message(message):
         await message.channel.send(schedule(ma,mcl))
     elif mcl.startswith("/show_schedule") or mcl.startswith("/ss"):
         await message.channel.send(show_schedule(ma,mcl))
-    elif mcl.startswith("/show_employee") or mcl.startswith("/se"):
-        await message.channel.send(show_employee(mcl))
     elif mcl.startswith("/help"):
         await message.channel.send(help_task(mcl))
         await message.channel.send(file=discord.File('gifs/help_sent.gif'))
