@@ -176,6 +176,7 @@ async def handle_message(message):
     if mcl.startswith("/add_task") or mcl.startswith("/at"):
         #if no there is no : then due date is set to a week
         t = read_task_from_message(mcl)
+        t.name = message.guild.name +"/"+ t.name
         for member in message.mentions:
             add_task(member,t)
         for r in message.role_mentions:
