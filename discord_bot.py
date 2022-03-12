@@ -1,4 +1,4 @@
-#!/bin/python
+#!/bin/env python3
 import discord
 from discord.ext import commands
 import sqlite3
@@ -206,7 +206,6 @@ async def handle_message(message):
         await message.channel.send(file=discord.File('gifs/help_sent.gif'))
     else:
         await message.channel.send("hmmm...try again")
-
 
 #handle the discord interface
 class MyClient(discord.Client):
